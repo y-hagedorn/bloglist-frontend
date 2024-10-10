@@ -12,9 +12,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
   const [notification, setNotification] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
 
@@ -62,21 +59,11 @@ const App = () => {
     console.log('logging in with', username, password)
   }
 
-  const addBlog = (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
-    }
-
+  const addBlog = (blogObject) => {
     blogService
       .create(blogObject)
       .then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
-        setNewTitle('')
-        setNewAuthor('')
-        setNewUrl('')
         setNotificationType('successful')
         setNotification(
           `Added new blog: '${returnedBlog.title}' by ${returnedBlog.author}`
@@ -97,21 +84,6 @@ const App = () => {
           setNotificationType(null)
         }, 5000)
       })
-  }
-
-  const handleTitleInput = (event) => {
-    console.log(event.target.value)
-    setNewTitle(event.target.value)
-  }
-
-  const handleAuthorInput = (event) => {
-    console.log(event.target.value)
-    setNewAuthor(event.target.value)
-  }
-
-  const handleUrlInput = (event) => {
-    console.log(event.target.value)
-    setNewUrl(event.target.value)
   }
 
   const loginForm = () => (
@@ -141,8 +113,6 @@ const App = () => {
     </>
   )
 
-
-
   return (
     <div>
       <Notification
@@ -163,15 +133,7 @@ const App = () => {
         </button>
         <p></p>
         <Togglable buttonLabel="Add new blog">
-          <BlogForm
-            handleSubmit={addBlog}
-            title={newTitle}
-            author={newAuthor}
-            url={newUrl}
-            handleTitleChange={handleTitleInput}
-            handleAuthorChange={handleAuthorInput}
-            handleUrlChange={handleUrlInput}
-          />
+          <BlogForm createBlog={addBlog} />
         </Togglable>
         <h2>Blogs</h2>
         <div>
