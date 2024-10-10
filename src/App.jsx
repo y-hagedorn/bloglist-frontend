@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
+import './index.css'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -11,6 +13,8 @@ const App = () => {
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
+  const [notification, setNotification] = useState(null)
+  const [notificationType, setNotificationType] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -42,9 +46,11 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
+      setNotificationType('unsuccessful')
+      setNotification('Wrong username or password')
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotificationType(null)
+        setNotification(null)
       }, 5000)
     }
 
@@ -66,6 +72,25 @@ const App = () => {
         setNewTitle('')
         setNewAuthor('')
         setNewUrl('')
+        setNotificationType('successful')
+        setNotification(
+          `Added new blog: '${returnedBlog.title}' by ${returnedBlog.author}`
+        )
+        setTimeout(() => {
+          setNotification(null)
+          setNotificationType(null)
+        }, 5000)
+      })
+      .catch(error => {
+        console.log('Post request failed', error)
+        setNotificationType('unsuccessful')
+        setNotification(
+          `Could not add '${blogObject.title}' by ${blogObject.author}`
+        )
+        setTimeout(() => {
+          setNotification(null)
+          setNotificationType(null)
+        }, 5000)
       })
   }
 
@@ -116,21 +141,21 @@ const App = () => {
       <h2>Add new Blog</h2>
       <form onSubmit={addBlog}>
         <div>
-          Title: 
+          Title:
           <input
             value={newTitle}
             onChange={handleTitleInput}
           />
         </div>
         <div>
-          Author: 
+          Author:
           <input
             value={newAuthor}
             onChange={handleAuthorInput}
           />
         </div>
         <div>
-          Url: 
+          Url:
           <input
             value={newUrl}
             onChange={handleUrlInput}
@@ -150,6 +175,10 @@ const App = () => {
 
   return (
     <div>
+      <Notification
+        message={notification}
+        type={notificationType}
+      />
       {!user && loginForm()}
       {user && <div>
         <p>{user.name} logged in</p>
