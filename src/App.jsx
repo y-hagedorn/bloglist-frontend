@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import './index.css'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -17,12 +19,6 @@ const App = () => {
   const [notificationType, setNotificationType] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
-  }, [])
-
-  useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
@@ -31,8 +27,17 @@ const App = () => {
     }
   }, [])
 
+  useEffect(() => {
+    blogService
+      .getAll()
+      .then(blogs =>
+        setBlogs(blogs)
+      )
+  }, [])
+
   const handleLogin = async (event) => {
     event.preventDefault()
+
     try {
       const user = await loginService.login({
         username, password,
@@ -136,42 +141,7 @@ const App = () => {
     </>
   )
 
-  const blogForm = () => (
-    <>
-      <h2>Add new Blog</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          Title:
-          <input
-            value={newTitle}
-            onChange={handleTitleInput}
-          />
-        </div>
-        <div>
-          Author:
-          <input
-            value={newAuthor}
-            onChange={handleAuthorInput}
-          />
-        </div>
-        <div>
-          Url:
-          <input
-            value={newUrl}
-            onChange={handleUrlInput}
-          />
-        </div>
-        <p></p>
-        <button type="submit">add</button>
-      </form>
-      <h2>Blogs</h2>
-      <div>
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )}
-      </div>
-    </>
-  )
+
 
   return (
     <div>
@@ -179,6 +149,7 @@ const App = () => {
         message={notification}
         type={notificationType}
       />
+
       {!user && loginForm()}
       {user && <div>
         <p>{user.name} logged in</p>
@@ -191,7 +162,23 @@ const App = () => {
           logout
         </button>
         <p></p>
-        {blogForm()}
+        <Togglable buttonLabel="Add new blog">
+          <BlogForm
+            handleSubmit={addBlog}
+            title={newTitle}
+            author={newAuthor}
+            url={newUrl}
+            handleTitleChange={handleTitleInput}
+            handleAuthorChange={handleAuthorInput}
+            handleUrlChange={handleUrlInput}
+          />
+        </Togglable>
+        <h2>Blogs</h2>
+        <div>
+          {blogs.map(blog =>
+            <Blog key={blog.id} blog={blog} />
+          )}
+        </div>
       </div>
       }
     </div>
