@@ -27,9 +27,9 @@ const App = () => {
   useEffect(() => {
     blogService
       .getAll()
-      .then(blogs =>
-        setBlogs(blogs)
-      )
+      .then(blogs => {
+        setBlogs(sortBlogsByLikes(blogs))
+      })
   }, [])
 
   const handleLogin = async (event) => {
@@ -59,11 +59,16 @@ const App = () => {
     console.log('logging in with', username, password)
   }
 
+  const sortBlogsByLikes = (blogs) => {
+    return blogs.sort((few, more) => more.likes - few.likes)
+  }
+
   const addBlog = (blogObject) => {
     blogService
       .create(blogObject)
       .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
+        const updatedBlogs = blogs.concat(returnedBlog)
+        setBlogs(sortBlogsByLikes(updatedBlogs))
         setNotificationType('successful')
         setNotification(
           `Added new blog: '${returnedBlog.title}' by ${returnedBlog.author}`
