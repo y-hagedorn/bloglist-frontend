@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
@@ -14,6 +14,8 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [notification, setNotification] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
@@ -64,6 +66,7 @@ const App = () => {
   }
 
   const addBlog = (blogObject) => {
+    blogFormRef.current.toggleVisibility()
     blogService
       .create(blogObject)
       .then(returnedBlog => {
@@ -137,7 +140,7 @@ const App = () => {
           logout
         </button>
         <p></p>
-        <Togglable buttonLabel="Add new blog">
+        <Togglable buttonLabel="Add new blog" ref={blogFormRef}>
           <BlogForm createBlog={addBlog} />
         </Togglable>
         <h2>Blogs</h2>
