@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import blogService from '../services/blogs'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, loggedInUser }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -14,8 +14,8 @@ const Blog = ({ blog }) => {
   const [blogEntry, setBlogEntry] = useState(blog)
   const [detailVisible, setDetailVisible] = useState(false)
 
-  const hideWhenVisible = { display: detailVisible ? 'none' : '' }
   const showWhenVisible = { display: detailVisible ? '' : 'none' }
+  const isBlogOwner = loggedInUser && blogEntry.user.name === loggedInUser
 
   const handleLike = async () => {
     const updatedBlog = {
@@ -37,6 +37,20 @@ const Blog = ({ blog }) => {
     }
   }
 
+  const handleDelete = async () => {
+
+    console.log(`delete blog with ${blogEntry.id}`)
+
+    try {
+      if (window.confirm(`Do you really want to delete '${blogEntry.title}' by ${blogEntry.author}?`)) {
+        const returnedBlog = await blogService.deleteBlog(blogEntry.id)
+        console.log(`Deleted blog: '${blogEntry.title}' by ${blogEntry.author}`)
+      }
+    } catch (error) {
+      console.error('Delete request failed', error)
+    }
+  }
+
   return (
     <div style={blogStyle}>
       <div>
@@ -51,6 +65,9 @@ const Blog = ({ blog }) => {
         Likes: {blogEntry.likes} <button onClick={() => handleLike(blogEntry)}>like</button><br />
         {blogEntry.user.name} <br />
         <p></p>
+        {isBlogOwner && (
+          <button onClick={() => handleDelete()}>delete</button>
+        )}
       </div>
     </div>
   )
