@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 import './index.css'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -94,33 +95,6 @@ const App = () => {
       })
   }
 
-  const loginForm = () => (
-    <>
-      <h2>Log in to application</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </>
-  )
-
   return (
     <div>
       <Notification
@@ -128,7 +102,13 @@ const App = () => {
         type={notificationType}
       />
 
-      {!user && loginForm()}
+      {!user && <LoginForm
+        username={username}
+        password={password}
+        handleUsernameChange={({ target }) => setUsername(target.value)}
+        handlePasswordChange={({ target }) => setPassword(target.value)}
+        handleSubmit={handleLogin}
+      />}
       {user && <div>
         <p>{user.name} logged in</p>
         <button
